@@ -54,6 +54,18 @@ typedef struct vl_color
 */
 #define VL_WHITE (vl_color) { 255, 255, 255 }
 /**
+  Black.
+*/
+#define VL_BLACK (vl_color) { 0, 0, 0 }
+/**
+  Gray.
+*/
+#define VL_GRAY (vl_color) { 100, 100, 100 }
+/**
+  Light gray.
+*/
+#define VL_LIGHT_GRAY (vl_color) { 175, 175, 175 }
+/**
   Light blue.
 */
 #define VL_LIGHT_BLUE (vl_color) { 0, 125, 215 }
@@ -222,12 +234,33 @@ typedef struct vl_config
 	*/
 	bool print_date;
 	/**
-	  Indicates whether or not VibrantLogs will
-	  print the current date's month as a number
-	  value, or the month's name. This is false by
-	  default.
+	  Indicates whether or not VibrantLogs should
+	  print the month's name instead of a number value.
+	  This is false by default.
+
+	  @note If this is true, this will result in the
+	  month's full name being used. Additionally,
+	  if this and 'print_abbrev_month_name' are both
+	  true, 'print_full_month_name' takes precedence.
+
+	  @important For month names to print, 'print_date'
+	  also needs to be true.
 	*/
-	bool print_month_name;
+	bool print_full_month_name;
+	/**
+	  Indicates whether or not VibrantLogs should
+	  print the month's name instead of a number value.
+	  This is false by default.
+
+	  @note If this is true, this will result in the
+	  month's abbreviated name being used. Additionally,
+	  if this and 'print_full_month_name' are both true,
+	  'print_full_month_name' takes precedence.
+
+	  @important For month names to print, 'print_date'
+	  also needs to be true.
+	*/
+	bool print_abbrev_month_name;
 } vl_config;
 
 #ifdef _WIN32
