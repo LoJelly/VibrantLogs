@@ -161,7 +161,7 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 
 			// now get the corresponding month name
 			char month_name[10];
-			timey_query_month_name(month_name, sizeof month_name, month_num, print_full_month_name ? print_full_month_name : print_abbrev_month_name);
+			timey_query_month_name(month_name, sizeof month_name, month_num, print_abbrev_month_name);
 
 			size_t month_name_len = strlen(month_name);
 
