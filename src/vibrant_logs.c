@@ -23,16 +23,6 @@
 // enough chars to fit the date string in VibrantLogs ('[MM-DD-YYYY]' or '[MONTH-DD-YYYY]') (includes null terminator)
 #define DATE_STR_LEN 20
 
-// array of months, where the index corresponds to the month number - 1
-static const char *full_month_names[12] = {
-	"January", "February", "March", "April", "May", "June",
-	"July", "August", "September", "October", "November", "December"
-};
-static const char *abbrev_month_names[12] = {
-	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-};
-
 typedef struct vl_delayed_msg
 {
 	// the message to print
@@ -170,14 +160,8 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 				return;
 
 			// now get the corresponding month name
-			const char *month_name = NULL;
-			if(print_full_month_name)
-				month_name = full_month_names[month_num - 1];
-			else if(print_abbrev_month_name)
-				month_name = abbrev_month_names[month_num - 1];
-
-			if(!month_name)
-				return;
+			char month_name[10];
+			timey_query_month_name(month_name, sizeof month_name, month_num, print_full_month_name ? print_full_month_name : print_abbrev_month_name);
 
 			size_t month_name_len = strlen(month_name);
 
