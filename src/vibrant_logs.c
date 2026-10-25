@@ -298,7 +298,7 @@ int vl_init()
 		return 0;
 
 	// default config:
-	config.colors = VL_DEFAULT_COLORS;
+	config.colors = VL_COLOR_SCHEME_DEFAULT;
 	config.output_destination = stdout;
 	config.log_level = VL_INFO;
 	config.print_time = true;

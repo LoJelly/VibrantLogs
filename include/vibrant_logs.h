@@ -5,7 +5,7 @@
 /**
   Represents the type of a log statement.
 */
-typedef enum
+typedef enum vl_type
 {
 	/**
 	  Used for normal log messages.
@@ -60,7 +60,7 @@ typedef struct vl_color
 /**
   Gray.
 */
-#define VL_GRAY (vl_color) { 100, 100, 100 }
+#define VL_GRAY (vl_color) { 125, 125, 125 }
 /**
   Light gray.
 */
@@ -105,11 +105,19 @@ typedef struct vl_color
   Red.
 */
 #define VL_RED (vl_color) { 255, 0, 0 }
+/**
+  Light pink.
+*/
+#define VL_LIGHT_PINK (vl_color) { 220, 22, 120 }
+/**
+  Pink.
+*/
+#define VL_PINK (vl_color) { 255, 0, 130 }
 
 /**
   Represents the color scheme of VibrantLogs.
 
-  @see VL_DEFAULT_COLORS
+  @see VL_COLOR_SCHEME_DEFAULT
 */
 typedef struct vl_color_scheme
 {
@@ -170,9 +178,9 @@ typedef struct vl_color_scheme
 } vl_color_scheme;
 
 /**
-  Obtains the default color scheme of VibrantLogs.
+  The default color scheme of VibrantLogs.
 */
-#define VL_DEFAULT_COLORS (vl_color_scheme) { \
+#define VL_COLOR_SCHEME_DEFAULT (vl_color_scheme) { \
 		.time_color = VL_WHITE, \
 		.date_color = VL_WHITE, \
 		.info_prefix_color = VL_LIGHT_BLUE, \
@@ -186,6 +194,92 @@ typedef struct vl_color_scheme
 		.error_prefix_color = VL_LIGHT_RED, \
 		.error_color = VL_RED \
 	};
+/**
+  A dimmer version of the default color scheme.
+*/
+#define VL_COLOR_SCHEME_DEFAULT_DIM (vl_color_scheme) { \
+		.time_color = VL_LIGHT_GRAY, \
+		.date_color = VL_LIGHT_GRAY, \
+		.info_prefix_color = (vl_color) { 25, 115, 180 }, \
+		.info_color = (vl_color) { 25, 200, 200 }, \
+		.success_prefix_color = (vl_color) { 15, 150, 15 }, \
+		.success_color = (vl_color) { 30, 200, 30 }, \
+		.debug_prefix_color = (vl_color) { 175, 115, 15 }, \
+		.debug_color = (vl_color) { 190, 135, 30 }, \
+		.warning_prefix_color = (vl_color) { 170, 170, 20 }, \
+		.warning_color = (vl_color) { 200, 200, 30 }, \
+		.error_prefix_color = (vl_color) { 175, 15, 15 }, \
+		.error_color = (vl_color) { 200, 25, 25 } \
+	};
+
+/**
+  The Candy Land color scheme.
+*/
+#define VL_COLOR_SCHEME_CANDY_LAND (vl_color_scheme) { \
+		.time_color = (vl_color) { 255, 0, 100 }, \
+		.date_color = VL_PINK, \
+		.info_prefix_color = (vl_color) { 75, 150, 225 }, \
+		.info_color = (vl_color) { 0, 125, 255 }, \
+		.success_prefix_color = (vl_color) { 35, 210, 100 }, \
+		.success_color = (vl_color) { 0, 255, 100 }, \
+		.debug_prefix_color = (vl_color) { 200, 170, 50 }, \
+		.debug_color = (vl_color) { 225, 180, 15 }, \
+		.warning_prefix_color = (vl_color) { 225, 145, 75 }, \
+		.warning_color = (vl_color) { 255, 130, 0 }, \
+		.error_prefix_color = (vl_color) { 100, 45, 150 }, \
+		.error_color = (vl_color) { 140, 0, 255 } \
+	};
+/**
+  The Cloudy color scheme.
+*/
+#define VL_COLOR_SCHEME_CLOUDY (vl_color_scheme) { \
+		.time_color = (vl_color) { 190, 190, 190 }, \
+		.date_color = (vl_color) { 190, 190, 190 }, \
+		.info_prefix_color = (vl_color) { 60, 100, 150 }, \
+		.info_color = (vl_color) { 35, 115, 190 }, \
+		.success_prefix_color = (vl_color) { 75, 190, 85 }, \
+		.success_color = (vl_color) { 60, 255, 75 }, \
+		.debug_prefix_color = (vl_color) { 60, 160, 175 }, \
+		.debug_color = (vl_color) { 20, 190, 210 }, \
+		.warning_prefix_color = VL_LIGHT_YELLOW, \
+		.warning_color = (vl_color) VL_YELLOW, \
+		.error_prefix_color = (vl_color) { 185, 125, 55 }, \
+		.error_color = (vl_color) { 210, 125, 25 } \
+	};
+/**
+  The Monotone color scheme.
+*/
+#define VL_COLOR_SCHEME_MONOTONE (vl_color_scheme) { \
+		.time_color = VL_LIGHT_GRAY, \
+		.date_color = VL_LIGHT_GRAY, \
+		.info_prefix_color = VL_GRAY, \
+		.info_color = VL_WHITE, \
+		.success_prefix_color = VL_GRAY, \
+		.success_color = VL_WHITE, \
+		.debug_prefix_color = VL_GRAY, \
+		.debug_color = VL_WHITE, \
+		.warning_prefix_color = VL_GRAY, \
+		.warning_color = VL_WHITE, \
+		.error_prefix_color = VL_GRAY, \
+		.error_color = VL_WHITE \
+	};
+/**
+  The Wizard color scheme.
+*/
+#define VL_COLOR_SCHEME_WIZARD (vl_color_scheme) { \
+		.time_color = (vl_color) { 110, 145, 210 }, \
+		.date_color = (vl_color) { 100, 145, 255 }, \
+		.info_prefix_color = (vl_color) { 130, 100, 30 }, \
+		.info_color = (vl_color) { 170, 115, 10 }, \
+		.success_prefix_color = (vl_color) { 170, 170, 50 }, \
+		.success_color = (vl_color) { 200, 200, 15 }, \
+		.debug_prefix_color = (vl_color) { 40, 160, 170 }, \
+		.debug_color = (vl_color) { 20, 190, 200 }, \
+		.warning_prefix_color = (vl_color) { 100, 150, 50 }, \
+		.warning_color = (vl_color) { 110, 180, 30 }, \
+		.error_prefix_color = (vl_color) { 160, 60, 60 }, \
+		.error_color = (vl_color) { 200, 30, 30 } \
+	};
 
 /**
   Represents a custom config for VibrantLogs.
@@ -198,7 +292,7 @@ typedef struct vl_config
 	/**
 	  The color scheme of VibrantLogs.
 
-	  By default, it is set to VL_DEFAULT_COLORS.
+	  By default, it is set to VL_COLOR_SCHEME_DEFAULT.
 	*/
 	vl_color_scheme colors;
 	/**
