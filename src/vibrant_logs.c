@@ -20,14 +20,10 @@
 #define MAX_DELAY_MSGS 64
 // enough chars to fit the time string in VibrantLogs ('[HH:MM:SS]') (includes null terminator)
 #define TIME_STR_LEN 11
-/*
-   enough chars to fit the date string in VibrantLogs ('[MM-DD-YYYY]' or '[MONTH-DD-YYYY]') (includes null terminator)
-
-   also enough chars to fit the date string holding the day's name
-*/
+//enough chars to fit the longest possible date string in VibrantLogs ('[MM-DD-YYYY]' or '[MONTH-DD-YYYY]') (includes null terminator)
 #define DATE_STR_LEN 30
 
-typedef struct vl_delayed_msg
+typedef struct delayed_msg
 {
 	// the message to print
 	char msg[MAX_MSG_LEN + 1];
@@ -37,9 +33,9 @@ typedef struct vl_delayed_msg
 	vl_type type;
 	// should the message label be printed?
 	bool print_label;
-} vl_delayed_msg;
+} delayed_msg;
 
-typedef struct vl_scheduled_msg
+typedef struct scheduled_msg
 {
 	// msg to print
 	char msg[MAX_MSG_LEN + 1];
@@ -53,21 +49,21 @@ typedef struct vl_scheduled_msg
 	bool scheduled_ts;
 	// should the message label be printed?
 	bool print_label;
-} vl_scheduled_msg;
+} scheduled_msg;
 
 // storage of all delayed logs:
-static vl_delayed_msg delayed_msgs[MAX_DELAY_MSGS];
+static delayed_msg delayed_msgs[MAX_DELAY_MSGS];
 static size_t delayed_msg_count = 0;
 
 // storage of all scheduled logs:
-static vl_scheduled_msg scheduled_msgs[MAX_DELAY_MSGS];
+static scheduled_msg scheduled_msgs[MAX_DELAY_MSGS];
 static size_t scheduled_msg_count = 0;
 
-static bool vl_is_init = false;
+static bool init = false;
 static vl_config config = {0};
 
 // macro for quickly obtaining the RGB value of a color (used when printing to shorten lines)
-#define vl_rgb(color) color.r, color.g, color.b
+#define rgb(color) color.r, color.g, color.b
 
 // determine if config.output_destination is a file/terminal
 static bool can_use_colors(void)
@@ -101,9 +97,9 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 	{
 		// no check for 'use_colors' here since printf uses stdout by default
 		if(print_label)
-			printf("\x1b[38;2;%d;%d;%dm[ ERROR ] \x1b[38;2;%d;%d;%dm%s\x1b[0m", vl_rgb(config.colors.error_prefix_color), vl_rgb(config.colors.error_color), "Output destination is NULL, make sure you call vl_init()!");
+			printf("\x1b[38;2;%d;%d;%dm[ ERROR ] \x1b[38;2;%d;%d;%dm%s\x1b[0m", rgb(config.colors.error_prefix_color), rgb(config.colors.error_color), "Output destination is NULL, make sure you call vl_init()!");
 		else
-			printf("\x1b[38;2;%d;%d;%dm\x1b[38;2;%d;%d;%dm%s\x1b[0m", vl_rgb(config.colors.error_prefix_color), vl_rgb(config.colors.error_color), "Output destination is NULL, make sure you call vl_init()!");
+			printf("\x1b[38;2;%d;%d;%dm\x1b[38;2;%d;%d;%dm%s\x1b[0m", rgb(config.colors.error_prefix_color), rgb(config.colors.error_color), "Output destination is NULL, make sure you call vl_init()!");
 		return;
 	}
 
@@ -125,7 +121,7 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 		// obtain formatted time string
 		char time_str[32]; // time string (11 chars) + format string (21 chars) = 32
 		if(use_colors)
-			get_fmt_str(time_str, sizeof time_str, "\x1b[38;2;%d;%d;%dm%s ", vl_rgb(config.colors.time_color), time_buf);
+			get_fmt_str(time_str, sizeof time_str, "\x1b[38;2;%d;%d;%dm%s ", rgb(config.colors.time_color), time_buf);
 		else
 			get_fmt_str(time_str, sizeof time_str, "%s ", time_buf);
 
@@ -225,7 +221,7 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 		// obtain formatted date string
 		char date_str[DATE_STR_LEN + 21]; // date string (20 chars) + format string (21 chars) = 41
 		if(use_colors)
-			get_fmt_str(date_str, sizeof date_str, "\x1b[38;2;%d;%d;%dm%s ", vl_rgb(config.colors.date_color), date_buf);
+			get_fmt_str(date_str, sizeof date_str, "\x1b[38;2;%d;%d;%dm%s ", rgb(config.colors.date_color), date_buf);
 		else
 			get_fmt_str(date_str, sizeof date_str, "%s ", date_buf);
 
@@ -242,14 +238,14 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 			if(print_label)
 			{
 				if(use_colors)
-					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm[ INFO ] \x1b[38;2;%d;%d;%dm%s\x1b[0m", vl_rgb(config.colors.info_prefix_color), vl_rgb(config.colors.info_color), msg);
+					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm[ INFO ] \x1b[38;2;%d;%d;%dm%s\x1b[0m", rgb(config.colors.info_prefix_color), rgb(config.colors.info_color), msg);
 				else
 					get_fmt_str(final_str, sizeof final_str, "[ INFO ] %s", msg);
 			}
 			else
 			{
 				if(use_colors)
-					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm\x1b[38;2;%d;%d;%dm%s\x1b[0m", vl_rgb(config.colors.info_prefix_color), vl_rgb(config.colors.info_color), msg);
+					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm\x1b[38;2;%d;%d;%dm%s\x1b[0m", rgb(config.colors.info_prefix_color), rgb(config.colors.info_color), msg);
 				else
 					get_fmt_str(final_str, sizeof final_str, "%s", msg);
 			}
@@ -258,14 +254,14 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 			if(print_label)
 			{
 				if(use_colors)
-					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm[ SUCCESS ] \x1b[38;2;%d;%d;%dm%s\x1b[0m", vl_rgb(config.colors.success_prefix_color), vl_rgb(config.colors.success_color), msg);
+					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm[ SUCCESS ] \x1b[38;2;%d;%d;%dm%s\x1b[0m", rgb(config.colors.success_prefix_color), rgb(config.colors.success_color), msg);
 				else
 					get_fmt_str(final_str, sizeof final_str, "[ SUCCESS ] %s", msg);
 			}
 			else
 			{
 				if(use_colors)
-					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm\x1b[38;2;%d;%d;%dm%s\x1b[0m", vl_rgb(config.colors.success_prefix_color), vl_rgb(config.colors.success_color), msg);
+					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm\x1b[38;2;%d;%d;%dm%s\x1b[0m", rgb(config.colors.success_prefix_color), rgb(config.colors.success_color), msg);
 				else
 					get_fmt_str(final_str, sizeof final_str, "%s", msg);
 			}
@@ -274,14 +270,14 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 			if(print_label)
 			{
 				if(use_colors)
-					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm[ DEBUG ] \x1b[38;2;%d;%d;%dm%s\x1b[0m", vl_rgb(config.colors.debug_prefix_color), vl_rgb(config.colors.debug_color), msg);
+					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm[ DEBUG ] \x1b[38;2;%d;%d;%dm%s\x1b[0m", rgb(config.colors.debug_prefix_color), rgb(config.colors.debug_color), msg);
 				else
 					get_fmt_str(final_str, sizeof final_str, "[ DEBUG ] %s", msg);
 			}
 			else
 			{
 				if(use_colors)
-					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm\x1b[38;2;%d;%d;%dm%s\x1b[0m", vl_rgb(config.colors.debug_prefix_color), vl_rgb(config.colors.debug_color), msg);
+					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm\x1b[38;2;%d;%d;%dm%s\x1b[0m", rgb(config.colors.debug_prefix_color), rgb(config.colors.debug_color), msg);
 				else
 					get_fmt_str(final_str, sizeof final_str, "%s", msg);
 			}
@@ -290,14 +286,14 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 			if(print_label)
 			{
 				if(use_colors)
-					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm[ WARNING ] \x1b[38;2;%d;%d;%dm%s\x1b[0m", vl_rgb(config.colors.warning_prefix_color), vl_rgb(config.colors.warning_color), msg);
+					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm[ WARNING ] \x1b[38;2;%d;%d;%dm%s\x1b[0m", rgb(config.colors.warning_prefix_color), rgb(config.colors.warning_color), msg);
 				else
 					get_fmt_str(final_str, sizeof final_str, "[ WARNING ] %s", msg);
 			}
 			else
 			{
 				if(use_colors)
-					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm\x1b[38;2;%d;%d;%dm%s\x1b[0m", vl_rgb(config.colors.warning_prefix_color), vl_rgb(config.colors.warning_color), msg);
+					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm\x1b[38;2;%d;%d;%dm%s\x1b[0m", rgb(config.colors.warning_prefix_color), rgb(config.colors.warning_color), msg);
 				else
 					get_fmt_str(final_str, sizeof final_str, "%s", msg);
 			}
@@ -307,14 +303,14 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 			if(print_label)
 			{
 				if(use_colors)
-					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm[ ERROR ] \x1b[38;2;%d;%d;%dm%s\x1b[0m", vl_rgb(config.colors.error_prefix_color), vl_rgb(config.colors.error_color), msg);
+					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm[ ERROR ] \x1b[38;2;%d;%d;%dm%s\x1b[0m", rgb(config.colors.error_prefix_color), rgb(config.colors.error_color), msg);
 				else
 					get_fmt_str(final_str, sizeof final_str, "[ ERROR ] %s", msg);
 			}
 			else
 			{
 				if(use_colors)
-					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm\x1b[38;2;%d;%d;%dm%s\x1b[0m", vl_rgb(config.colors.error_prefix_color), vl_rgb(config.colors.error_color), msg);
+					get_fmt_str(final_str, sizeof final_str, "\x1b[38;2;%d;%d;%dm\x1b[38;2;%d;%d;%dm%s\x1b[0m", rgb(config.colors.error_prefix_color), rgb(config.colors.error_color), msg);
 				else
 					get_fmt_str(final_str, sizeof final_str, "%s", msg);
 			}
@@ -327,7 +323,7 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 
 int vl_init()
 {
-	if(vl_is_init)
+	if(init)
 		return 0;
 
 	// default config:
@@ -341,7 +337,7 @@ int vl_init()
 	config.print_full_month_name = false;
 	config.print_abbrev_month_name = false;
 
-	vl_is_init = true;
+	init = true;
 
 	return 1;
 }
@@ -405,14 +401,15 @@ int vl_delay_log(vl_type log_type, double seconds, const char *fmt, ...)
 	vsnprintf(buf, sizeof buf, fmt, args);
 	va_end(args);
 
+	// search for duplicate message first
 	for(size_t i = 0; i < delayed_msg_count; ++i)
 	{
-		vl_delayed_msg *existing = &delayed_msgs[i];
+		delayed_msg *existing = &delayed_msgs[i];
 		if(existing -> type == log_type && strcmp(existing -> msg, buf) == 0)
 			return 0;
 	}
 
-	vl_delayed_msg *msg = &delayed_msgs[delayed_msg_count];
+	delayed_msg *msg = &delayed_msgs[delayed_msg_count];
 	msg -> type = log_type;
 	msg -> remaining_time_sec = seconds;
 	msg -> print_label = true;
@@ -436,14 +433,15 @@ int vl_delay_print(vl_type log_type, double seconds, const char *fmt, ...)
 	vsnprintf(buf, sizeof buf, fmt, args);
 	va_end(args);
 
+	// search for duplicate message first
 	for(size_t i = 0; i < delayed_msg_count; ++i)
 	{
-		vl_delayed_msg *existing = &delayed_msgs[i];
+		delayed_msg *existing = &delayed_msgs[i];
 		if(existing -> type == log_type && strcmp(existing -> msg, buf) == 0)
 			return 0;
 	}
 
-	vl_delayed_msg *msg = &delayed_msgs[delayed_msg_count];
+	delayed_msg *msg = &delayed_msgs[delayed_msg_count];
 	msg -> type = log_type;
 	msg -> remaining_time_sec = seconds;
 	msg -> print_label = false;
@@ -469,14 +467,15 @@ int vl_schedule_log_ts(vl_type log_type, timey_timestamp *ts, const char *fmt, .
 	vsnprintf(buf, sizeof buf, fmt, args);
 	va_end(args);
 
+	// search for duplicate message first
 	for(size_t i = 0; i < scheduled_msg_count; ++i)
 	{
-		vl_scheduled_msg *existing = &scheduled_msgs[i];
+		scheduled_msg *existing = &scheduled_msgs[i];
 		if(existing -> type == log_type && strcmp(existing -> msg, buf) == 0)
 			return 0;
 	}
 
-	vl_scheduled_msg *msg = &scheduled_msgs[scheduled_msg_count];
+	scheduled_msg *msg = &scheduled_msgs[scheduled_msg_count];
 	msg -> type = log_type;
 	msg -> ts = *ts;
 	msg -> dt = (timey_datetime) {0};
@@ -505,14 +504,15 @@ int vl_schedule_print_ts(vl_type log_type, struct timey_timestamp *ts, const cha
 	vsnprintf(buf, sizeof buf, fmt, args);
 	va_end(args);
 
+	// search for duplicate message first
 	for(size_t i = 0; i < scheduled_msg_count; ++i)
 	{
-		vl_scheduled_msg *existing = &scheduled_msgs[i];
+		scheduled_msg *existing = &scheduled_msgs[i];
 		if(existing -> type == log_type && strcmp(existing -> msg, buf) == 0)
 			return 0;
 	}
 
-	vl_scheduled_msg *msg = &scheduled_msgs[scheduled_msg_count];
+	scheduled_msg *msg = &scheduled_msgs[scheduled_msg_count];
 	msg -> type = log_type;
 	msg -> ts = *ts;
 	msg -> dt = (timey_datetime) {0};
@@ -541,14 +541,15 @@ int vl_schedule_log_dt(vl_type log_type, timey_datetime *dt, const char *fmt, ..
 	vsnprintf(buf, sizeof buf, fmt, args);
 	va_end(args);
 
+	// search for duplicate message first
 	for(size_t i = 0; i < scheduled_msg_count; ++i)
 	{
-		vl_scheduled_msg *existing = &scheduled_msgs[i];
+		scheduled_msg *existing = &scheduled_msgs[i];
 		if(existing -> type == log_type && strcmp(existing -> msg, buf) == 0)
 			return 0;
 	}
 
-	vl_scheduled_msg *msg = &scheduled_msgs[scheduled_msg_count];
+	scheduled_msg *msg = &scheduled_msgs[scheduled_msg_count];
 	msg -> type = log_type;
 	msg -> dt = *dt;
 	msg -> ts = (timey_timestamp) {0};
@@ -577,14 +578,15 @@ int vl_schedule_print_dt(vl_type log_type, timey_datetime *dt, const char *fmt, 
 	vsnprintf(buf, sizeof buf, fmt, args);
 	va_end(args);
 
+	// search for duplicate message first
 	for(size_t i = 0; i < scheduled_msg_count; ++i)
 	{
-		vl_scheduled_msg *existing = &scheduled_msgs[i];
+		scheduled_msg *existing = &scheduled_msgs[i];
 		if(existing -> type == log_type && strcmp(existing -> msg, buf) == 0)
 			return 0;
 	}
 
-	vl_scheduled_msg *msg = &scheduled_msgs[scheduled_msg_count];
+	scheduled_msg *msg = &scheduled_msgs[scheduled_msg_count];
 	msg -> type = log_type;
 	msg -> dt = *dt;
 	msg -> ts = (timey_timestamp) {0};
@@ -605,7 +607,7 @@ void vl_update(double delta_time)
 	for(size_t i = 0; i < delayed_msg_count;)
 	{
 		// get current message to work on
-		vl_delayed_msg *msg = &delayed_msgs[i];
+		delayed_msg *msg = &delayed_msgs[i];
 
 		// update timer
 		msg -> remaining_time_sec -= delta_time;
@@ -615,8 +617,19 @@ void vl_update(double delta_time)
 		{
 			print_msg(msg -> type, msg -> msg, msg -> print_label, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
 
-			// remove this msg and replace it with the last element
-			delayed_msgs[i] = delayed_msgs[--delayed_msg_count];
+			// remove this msg
+			size_t dest_pos = i;
+			size_t src_pos = i + 1;
+			// see if this msg is the last one in the array
+			if(src_pos >= MAX_DELAY_MSGS)
+				// if so, just decrement count
+				delayed_msg_count--;
+			else
+			{
+				// otherwise, shift everything after this msg to the left
+				memmove(&delayed_msgs[i], &delayed_msgs[i + 1], (delayed_msg_count - i - 1) * sizeof(*delayed_msgs));
+				delayed_msg_count--;
+			}
 		}
 		else
 			i++;
@@ -630,7 +643,7 @@ void vl_update(double delta_time)
 		timey_datetime now_dt = timey_curr_datetime();
 
 		// get current message to work on
-		vl_scheduled_msg *msg = &scheduled_msgs[i];
+		scheduled_msg *msg = &scheduled_msgs[i];
 
 		// check its timestamp or datetime vs. now_ts and now_dt
 		if(msg -> scheduled_ts)
@@ -645,7 +658,16 @@ void vl_update(double delta_time)
 				{
 					print_msg(msg -> type, msg -> msg, msg -> print_label, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
 
-					scheduled_msgs[i] = scheduled_msgs[--scheduled_msg_count];
+					// use same logic from delayed msg removal above:
+					size_t dest_pos = i;
+					size_t src_pos = i + 1;
+					if(src_pos >= MAX_DELAY_MSGS)
+						scheduled_msg_count--;
+					else
+					{
+						memmove(&scheduled_msgs[i], &scheduled_msgs[i + 1], (scheduled_msg_count - i - 1) * sizeof(*scheduled_msgs));
+						scheduled_msg_count--;
+					}
 				}
 				else
 					i++;
@@ -664,7 +686,16 @@ void vl_update(double delta_time)
 				{
 					print_msg(msg -> type, msg -> msg, true, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
 
-					scheduled_msgs[i] = scheduled_msgs[--scheduled_msg_count];
+					// use same logic from delayed msg removal above:
+					size_t dest_pos = i;
+					size_t src_pos = i + 1;
+					if(src_pos >= MAX_DELAY_MSGS)
+						scheduled_msg_count--;
+					else
+					{
+						memmove(&scheduled_msgs[i], &scheduled_msgs[i + 1], (scheduled_msg_count - i - 1) * sizeof(*scheduled_msgs));
+						scheduled_msg_count--;
+					}
 				}
 				else
 					i++;
