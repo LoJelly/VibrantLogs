@@ -20,8 +20,12 @@
 #define MAX_DELAY_MSGS 64
 // enough chars to fit the time string in VibrantLogs ('[HH:MM:SS]') (includes null terminator)
 #define TIME_STR_LEN 11
-// enough chars to fit the date string in VibrantLogs ('[MM-DD-YYYY]' or '[MONTH-DD-YYYY]') (includes null terminator)
-#define DATE_STR_LEN 20
+/*
+   enough chars to fit the date string in VibrantLogs ('[MM-DD-YYYY]' or '[MONTH-DD-YYYY]') (includes null terminator)
+
+   also enough chars to fit the date string holding the day's name
+*/
+#define DATE_STR_LEN 30
 
 typedef struct vl_delayed_msg
 {
@@ -90,7 +94,7 @@ static void get_fmt_str(char *buf, size_t size, const char *fmt, ...)
 }
 
 // print a message:
-static void print_msg(vl_type type, const char *msg, bool print_label, bool print_time, bool print_date, bool print_full_month_name, bool print_abbrev_month_name)
+static void print_msg(vl_type type, const char *msg, bool print_label, bool print_time, bool print_date, bool print_full_day_name, bool print_abbrev_day_name, bool print_full_month_name, bool print_abbrev_month_name)
 {
 	// see if config.output_destination is NULL, indicating vl_init() was never called
 	if(!config.output_destination)
@@ -136,9 +140,9 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 		char date_buf[DATE_STR_LEN];
 		timey_query_date(date_buf, sizeof date_buf);
 
-		/*
-		   now 'date_buf' holds 'mm-dd-yyyy' string
+		// now 'date_buf' holds the 'mm-dd-yyyy' string
 
+		/*
 		   but if the month name is supposed to be printed,
 		   print it like 'name-dd-yyyy' instead
 
@@ -171,6 +175,51 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 			memmove(date_buf + month_name_len, date_buf + 2, strlen(date_buf + 2) + 1);
 			// then copy the month name into the string
 			memcpy(date_buf, month_name, month_name_len);
+		}
+
+		// now see if the day name should be inserted at the beginning of the date
+		if(print_full_day_name || print_abbrev_day_name)
+		{
+			/*
+			   because the date string could be in 'name-dd-yyyy' format now,
+			   to parse the 'dd' part, first move to the first '-' character in the string
+			*/
+			const char *day_num_start = date_buf;
+
+			while(*day_num_start && *day_num_start != '-')
+				day_num_start++;
+
+			// skip the '-'
+			day_num_start++;
+
+			// now parse the 'dd' part of the string
+			char day_buf[3];
+			day_buf[0] = *day_num_start;
+			day_buf[1] = *(day_num_start + 1);
+			day_buf[2] = '\0';
+
+			// convert day number to an integer
+			char *end_ptr = NULL;
+			int day_num = strtol(day_buf, &end_ptr, 10);
+			if(end_ptr == day_buf)
+				return;
+
+			// now get the corresponding day name
+			char day_name[11]; // buffer will be 11 bytes to account for the ' ' character between the day and date
+			timey_query_day_name(day_name, sizeof day_name, day_num, false, print_abbrev_day_name);
+			// insert space into buffer
+			size_t end_of_day_name = strlen(day_name);
+			day_name[end_of_day_name] = ' ';
+			day_name[end_of_day_name + 1] = '\0';
+
+			size_t day_name_len = strlen(day_name);
+
+			// insert day name into the start of 'date_buf':
+
+			// first shift everything to the right to make room for the day name
+			memmove(date_buf + day_name_len, date_buf, strlen(date_buf) + 1);
+			// then copy the day name into the string
+			memcpy(date_buf, day_name, day_name_len);
 		}
 
 		// obtain formatted date string
@@ -287,6 +336,8 @@ int vl_init()
 	config.log_level = VL_INFO;
 	config.print_time = true;
 	config.print_date = false;
+	config.print_full_day_name = false;
+	config.print_abbrev_day_name = false;
 	config.print_full_month_name = false;
 	config.print_abbrev_month_name = false;
 
@@ -320,7 +371,7 @@ int vl_log(vl_type log_type, const char *fmt, ...)
 	va_end(args);
 
 	// print the message immediately
-	print_msg(log_type, buf, true, config.print_time, config.print_date, config.print_full_month_name, config.print_abbrev_month_name);
+	print_msg(log_type, buf, true, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
 
 	return 1;
 }
@@ -336,7 +387,7 @@ int vl_print(vl_type log_type, const char *fmt, ...)
 	vsnprintf(buf, sizeof buf, fmt, args);
 	va_end(args);
 
-	print_msg(log_type, buf, false, false, false, false, false);
+	print_msg(log_type, buf, false, false, false, false, false, false, false);
 
 	return 1;
 }
@@ -562,7 +613,7 @@ void vl_update(double delta_time)
 		// check to see if that message's time has passed
 		if(msg -> remaining_time_sec <= 0.0)
 		{
-			print_msg(msg -> type, msg -> msg, msg -> print_label, config.print_time, config.print_date, config.print_full_month_name, config.print_abbrev_month_name);
+			print_msg(msg -> type, msg -> msg, msg -> print_label, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
 
 			// remove this msg and replace it with the last element
 			delayed_msgs[i] = delayed_msgs[--delayed_msg_count];
@@ -592,7 +643,7 @@ void vl_update(double delta_time)
 				// now match hours, min, and sec
 				if(msg -> ts.hour12 == now_ts.hour12 && msg -> ts.min == now_ts.min && msg -> ts.sec == now_ts.sec)
 				{
-					print_msg(msg -> type, msg -> msg, msg -> print_label, config.print_time, config.print_date, config.print_full_month_name, config.print_abbrev_month_name);
+					print_msg(msg -> type, msg -> msg, msg -> print_label, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
 
 					scheduled_msgs[i] = scheduled_msgs[--scheduled_msg_count];
 				}
@@ -611,7 +662,7 @@ void vl_update(double delta_time)
 						msg -> dt.time.hour12 == now_dt.time.hour12 && msg -> dt.time.min == now_dt.time.min &&
 						msg -> dt.time.sec == now_dt.time.sec)
 				{
-					print_msg(msg -> type, msg -> msg, true, config.print_time, config.print_date, config.print_full_month_name, config.print_abbrev_month_name);
+					print_msg(msg -> type, msg -> msg, true, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
 
 					scheduled_msgs[i] = scheduled_msgs[--scheduled_msg_count];
 				}

@@ -182,7 +182,7 @@ typedef struct vl_color_scheme
 */
 #define VL_COLOR_SCHEME_DEFAULT (vl_color_scheme) { \
 		.time_color = VL_WHITE, \
-		.date_color = VL_WHITE, \
+		.date_color = (vl_color) { 190, 190, 190 }, \
 		.info_prefix_color = VL_LIGHT_BLUE, \
 		.info_color = VL_BLUE, \
 		.success_prefix_color = VL_LIGHT_GREEN, \
@@ -199,7 +199,7 @@ typedef struct vl_color_scheme
 */
 #define VL_COLOR_SCHEME_DEFAULT_DIM (vl_color_scheme) { \
 		.time_color = VL_LIGHT_GRAY, \
-		.date_color = VL_LIGHT_GRAY, \
+		.date_color = (vl_color) { 150, 150, 150 }, \
 		.info_prefix_color = (vl_color) { 25, 115, 180 }, \
 		.info_color = (vl_color) { 25, 200, 200 }, \
 		.success_prefix_color = (vl_color) { 15, 150, 15 }, \
@@ -234,7 +234,7 @@ typedef struct vl_color_scheme
 */
 #define VL_COLOR_SCHEME_CLOUDY (vl_color_scheme) { \
 		.time_color = (vl_color) { 190, 190, 190 }, \
-		.date_color = (vl_color) { 190, 190, 190 }, \
+		.date_color = (vl_color) { 210, 210, 245 }, \
 		.info_prefix_color = (vl_color) { 60, 100, 150 }, \
 		.info_color = (vl_color) { 35, 115, 190 }, \
 		.success_prefix_color = (vl_color) { 75, 190, 85 }, \
@@ -251,7 +251,7 @@ typedef struct vl_color_scheme
 */
 #define VL_COLOR_SCHEME_MONOTONE (vl_color_scheme) { \
 		.time_color = VL_LIGHT_GRAY, \
-		.date_color = VL_LIGHT_GRAY, \
+		.date_color = (vl_color) { 190, 190, 190 }, \
 		.info_prefix_color = VL_GRAY, \
 		.info_color = VL_WHITE, \
 		.success_prefix_color = VL_GRAY, \
@@ -327,6 +327,32 @@ typedef struct vl_config
 	  by default.
 	*/
 	bool print_date;
+	/**
+	  Indicates whether or not VibrantLogs should
+	  print the day's name. This is false by default.
+
+	  @note If this is true, this will result in the
+	  day's full name being used. Additionally,
+	  if this and 'print_abbrev_day_name' are both
+	  true, 'print_full_day_name' takes precedence.
+
+	  @important For day names to print, 'print_date'
+	  also needs to be true.
+	*/
+	bool print_full_day_name;
+	/**
+	  Indicates whether or not VibrantLogs should
+	  print the day's name. This is false by default.
+
+	  @note If this is true, this will result in the
+	  day's abbreviated name being used. Additionally,
+	  if this and 'print_full_day_name' are both true,
+	  'print_full_day_name' takes precedence.
+
+	  @important For day names to print, 'print_date'
+	  also needs to be true.
+	*/
+	bool print_abbrev_day_name;
 	/**
 	  Indicates whether or not VibrantLogs should
 	  print the month's name instead of a number value.
