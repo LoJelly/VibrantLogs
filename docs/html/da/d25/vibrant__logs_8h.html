@@ -127,6 +127,7 @@ Macros</h2></td></tr>
 <tr class="memitem:a56bd1d8d7e92ccbb76e78477c89a9858" id="r_a56bd1d8d7e92ccbb76e78477c89a9858"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a56bd1d8d7e92ccbb76e78477c89a9858">VL_COLOR_SCHEME_MONOTONE</a></td></tr>
 <tr class="memitem:aa3555602d8adb7f550dab5d858748476" id="r_aa3555602d8adb7f550dab5d858748476"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa3555602d8adb7f550dab5d858748476">VL_COLOR_SCHEME_WIZARD</a></td></tr>
 <tr class="memitem:ab7587fd8373e10d56375c7829aefbe95" id="r_ab7587fd8373e10d56375c7829aefbe95"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab7587fd8373e10d56375c7829aefbe95">VL_API</a></td></tr>
+<tr class="memitem:a37c93f20f1a959cfdda4d57ff371e3a6" id="r_a37c93f20f1a959cfdda4d57ff371e3a6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a37c93f20f1a959cfdda4d57ff371e3a6">VL_MAX_MSG_LEN</a>&#160;&#160;&#160;512</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -657,6 +658,23 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a37c93f20f1a959cfdda4d57ff371e3a6" name="a37c93f20f1a959cfdda4d57ff371e3a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37c93f20f1a959cfdda4d57ff371e3a6">&#9670;&#160;</a></span>VL_MAX_MSG_LEN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VL_MAX_MSG_LEN&#160;&#160;&#160;512</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The max length of a message in VibrantLogs. </p>
+
+<p class="definition">Definition at line <a class="el" href="../../da/d25/vibrant__logs_8h_source.html#l00403">403</a> of file <a class="el" href="../../da/d25/vibrant__logs_8h_source.html">vibrant_logs.h</a>.</p>
+
+</div>
+</div>
 <a id="aa93e2578a4e246ca25f31529971f3d85" name="aa93e2578a4e246ca25f31529971f3d85"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa93e2578a4e246ca25f31529971f3d85">&#9670;&#160;</a></span>VL_ORANGE</h2>
 
@@ -755,7 +773,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d25/vibrant__logs_8h_source.html#l00474">474</a> of file <a class="el" href="../../da/d25/vibrant__logs_8h_source.html">vibrant_logs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d25/vibrant__logs_8h_source.html#l00479">479</a> of file <a class="el" href="../../da/d25/vibrant__logs_8h_source.html">vibrant_logs.h</a>.</p>
 
 </div>
 </div>
@@ -771,7 +789,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d25/vibrant__logs_8h_source.html#l00473">473</a> of file <a class="el" href="../../da/d25/vibrant__logs_8h_source.html">vibrant_logs.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d25/vibrant__logs_8h_source.html#l00478">478</a> of file <a class="el" href="../../da/d25/vibrant__logs_8h_source.html">vibrant_logs.h</a>.</p>
 
 </div>
 </div>
@@ -930,7 +948,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Prints a delayed message.</p>
-<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is 256 characters.</dd>
+<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is equal to VL_MAX_MSG_LEN.</dd>
 <dd>
 VibrantLogs does not automatically go to the next line when printing messages.</dd>
 <dd>
@@ -970,7 +988,7 @@ This function only works when <a class="el" href="#ae2d8bb8d6aa8619f61374ab67407
       </table>
 </div><div class="memdoc">
 <p>Prints a delayed message.</p>
-<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is 256 characters.</dd>
+<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is equal to VL_MAX_MSG_LEN.</dd>
 <dd>
 VibrantLogs does not automatically go to the next line when printing messages.</dd>
 <dd>
@@ -1027,7 +1045,7 @@ This function only works when <a class="el" href="#ae2d8bb8d6aa8619f61374ab67407
       </table>
 </div><div class="memdoc">
 <p>Prints a message.</p>
-<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is 256 characters.</dd>
+<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is equal to VL_MAX_MSG_LEN.</dd>
 <dd>
 VibrantLogs does not automatically go to the next line when printing messages.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>1 on success, 0 on failure. </dd></dl>
@@ -1060,7 +1078,7 @@ VibrantLogs does not automatically go to the next line when printing messages.</
       </table>
 </div><div class="memdoc">
 <p>Continues printing characters to the last message printed.</p>
-<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is 256 characters.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is equal to VL_MAX_MSG_LEN.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>1 on success, 0 on failure. </dd></dl>
 
 <p class="reference">References <a class="el" href="../../da/d25/vibrant__logs_8h_source.html#l00397">VL_API</a>.</p>
@@ -1096,7 +1114,7 @@ VibrantLogs does not automatically go to the next line when printing messages.</
       </table>
 </div><div class="memdoc">
 <p>Schedules a message using a datetime.</p>
-<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is 256 characters.</dd>
+<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is equal to VL_MAX_MSG_LEN.</dd>
 <dd>
 VibrantLogs does not automatically go to the next line when printing messages.</dd>
 <dd>
@@ -1136,7 +1154,7 @@ This function only works when <a class="el" href="#ae2d8bb8d6aa8619f61374ab67407
       </table>
 </div><div class="memdoc">
 <p>Schedules a message using a timestamp.</p>
-<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is 256 characters.</dd>
+<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is equal to VL_MAX_MSG_LEN.</dd>
 <dd>
 VibrantLogs does not automatically go to the next line when printing messages.</dd>
 <dd>
@@ -1176,7 +1194,7 @@ This function only works when <a class="el" href="#ae2d8bb8d6aa8619f61374ab67407
       </table>
 </div><div class="memdoc">
 <p>Schedules a message using a datetime.</p>
-<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is 256 characters.</dd>
+<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is VL_MAX_MSG_LEN.</dd>
 <dd>
 VibrantLogs does not automatically go to the next line when printing messages.</dd>
 <dd>
@@ -1216,7 +1234,7 @@ This function only works when <a class="el" href="#ae2d8bb8d6aa8619f61374ab67407
       </table>
 </div><div class="memdoc">
 <p>Schedules a message using a timestamp.</p>
-<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is 256 characters.</dd>
+<dl class="section note"><dt>Note</dt><dd>The max length of a VibrantLogs message is equal to VL_MAX_MSG_LEN.</dd>
 <dd>
 VibrantLogs does not automatically go to the next line when printing messages.</dd>
 <dd>

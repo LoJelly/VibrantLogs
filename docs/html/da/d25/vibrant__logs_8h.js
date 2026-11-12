@@ -21,6 +21,7 @@ var vibrant__logs_8h =
     [ "VL_LIGHT_PINK", "da/d25/vibrant__logs_8h.html#a7e1895e353b27cdf9783bf9f6f08b468", null ],
     [ "VL_LIGHT_RED", "da/d25/vibrant__logs_8h.html#af961e4b6172afea921d9c6047937aef8", null ],
     [ "VL_LIGHT_YELLOW", "da/d25/vibrant__logs_8h.html#a9b940a128aac0555aa71bebcd48de522", null ],
+    [ "VL_MAX_MSG_LEN", "da/d25/vibrant__logs_8h.html#a37c93f20f1a959cfdda4d57ff371e3a6", null ],
     [ "VL_ORANGE", "da/d25/vibrant__logs_8h.html#aa93e2578a4e246ca25f31529971f3d85", null ],
     [ "VL_PINK", "da/d25/vibrant__logs_8h.html#a4cf34dff23d9b87cb16cb6910c3d3265", null ],
     [ "VL_RED", "da/d25/vibrant__logs_8h.html#acb9972b300e7783156ec6ff61767f427", null ],

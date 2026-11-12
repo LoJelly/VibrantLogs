@@ -14,8 +14,6 @@
 #include "timey.h"
 #include "vibrant_logs.h"
 
-// the max length of a VibrantLogs message (what the user enters, not what VibrantLogs inserts before or after messages)
-#define MAX_MSG_LEN 256
 // the max number of delayed log messages
 #define MAX_DELAY_MSGS 64
 // enough chars to fit the time string in VibrantLogs ('[HH:MM:SS]') (includes null terminator)
@@ -26,7 +24,7 @@
 typedef struct delayed_msg
 {
 	// the message to print
-	char msg[MAX_MSG_LEN + 1];
+	char msg[VL_MAX_MSG_LEN];
 	// the amount of seconds before the message prints
 	double remaining_time_sec;
 	// the log type
@@ -38,7 +36,7 @@ typedef struct delayed_msg
 typedef struct scheduled_msg
 {
 	// msg to print
-	char msg[MAX_MSG_LEN + 1];
+	char msg[VL_MAX_MSG_LEN];
 	// date-time
 	timey_datetime dt;
 	// time stamp
@@ -229,8 +227,8 @@ static void print_msg(vl_type type, const char *msg, bool print_label, bool prin
 		fwrite(date_str, sizeof(char), strlen(date_str), config.output_destination);
 	}
 
-	// buffer holding final log message (use MAX_MSG_LEN + 56 to fit color codes, prefixes, and null terminator)
-	char final_str[MAX_MSG_LEN + 56];
+	// buffer holding final log message (use VL_MAX_MSG_LEN + 56 to fit color codes, prefixes, and null terminator)
+	char final_str[VL_MAX_MSG_LEN + 56];
 
 	switch(type)
 	{
@@ -358,7 +356,7 @@ int vl_log(vl_type log_type, const char *fmt, ...)
 		return 0;
 
 	// buffer to store message
-	char buf[MAX_MSG_LEN + 1];
+	char buf[VL_MAX_MSG_LEN];
 
 	// populate buffer:
 	va_list args;
@@ -376,7 +374,7 @@ int vl_print(vl_type log_type, const char *fmt, ...)
 	if(!fmt)
 		return 0;
 
-	char buf[MAX_MSG_LEN + 1];
+	char buf[VL_MAX_MSG_LEN];
 
 	va_list args;
 	va_start(args, fmt);
@@ -395,7 +393,7 @@ int vl_delay_log(vl_type log_type, double seconds, const char *fmt, ...)
 	if(delayed_msg_count >= MAX_DELAY_MSGS)
 		return 0;
 
-	char buf[MAX_MSG_LEN + 1];
+	char buf[VL_MAX_MSG_LEN];
 	va_list args;
 	va_start(args, fmt);
 	vsnprintf(buf, sizeof buf, fmt, args);
@@ -405,17 +403,17 @@ int vl_delay_log(vl_type log_type, double seconds, const char *fmt, ...)
 	for(size_t i = 0; i < delayed_msg_count; ++i)
 	{
 		delayed_msg *existing = &delayed_msgs[i];
-		if(existing -> type == log_type && strcmp(existing -> msg, buf) == 0)
+		if(existing->type == log_type && strcmp(existing->msg, buf) == 0)
 			return 0;
 	}
 
 	delayed_msg *msg = &delayed_msgs[delayed_msg_count];
-	msg -> type = log_type;
-	msg -> remaining_time_sec = seconds;
-	msg -> print_label = true;
+	msg->type = log_type;
+	msg->remaining_time_sec = seconds;
+	msg->print_label = true;
 
-	strncpy(msg -> msg, buf, MAX_MSG_LEN);
-	msg -> msg[MAX_MSG_LEN] = '\0';
+	strncpy(msg->msg, buf, VL_MAX_MSG_LEN);
+	msg->msg[VL_MAX_MSG_LEN - 1] = '\0';
 	delayed_msg_count++;
 
 	return 1;
@@ -427,7 +425,7 @@ int vl_delay_print(vl_type log_type, double seconds, const char *fmt, ...)
 	if(delayed_msg_count >= MAX_DELAY_MSGS)
 		return 0;
 
-	char buf[MAX_MSG_LEN + 1];
+	char buf[VL_MAX_MSG_LEN];
 	va_list args;
 	va_start(args, fmt);
 	vsnprintf(buf, sizeof buf, fmt, args);
@@ -437,17 +435,17 @@ int vl_delay_print(vl_type log_type, double seconds, const char *fmt, ...)
 	for(size_t i = 0; i < delayed_msg_count; ++i)
 	{
 		delayed_msg *existing = &delayed_msgs[i];
-		if(existing -> type == log_type && strcmp(existing -> msg, buf) == 0)
+		if(existing->type == log_type && strcmp(existing->msg, buf) == 0)
 			return 0;
 	}
 
 	delayed_msg *msg = &delayed_msgs[delayed_msg_count];
-	msg -> type = log_type;
-	msg -> remaining_time_sec = seconds;
-	msg -> print_label = false;
+	msg->type = log_type;
+	msg->remaining_time_sec = seconds;
+	msg->print_label = false;
 
-	strncpy(msg -> msg, buf, MAX_MSG_LEN);
-	msg -> msg[MAX_MSG_LEN] = '\0';
+	strncpy(msg->msg, buf, VL_MAX_MSG_LEN);
+	msg->msg[VL_MAX_MSG_LEN - 1] = '\0';
 	delayed_msg_count++;
 
 	return 1;	
@@ -460,7 +458,7 @@ int vl_schedule_log_ts(vl_type log_type, timey_timestamp *ts, const char *fmt, .
 	if(scheduled_msg_count >= MAX_DELAY_MSGS)
 		return 0;
 
-	char buf[MAX_MSG_LEN + 1];
+	char buf[VL_MAX_MSG_LEN];
 
 	va_list args;
 	va_start(args, fmt);
@@ -471,19 +469,19 @@ int vl_schedule_log_ts(vl_type log_type, timey_timestamp *ts, const char *fmt, .
 	for(size_t i = 0; i < scheduled_msg_count; ++i)
 	{
 		scheduled_msg *existing = &scheduled_msgs[i];
-		if(existing -> type == log_type && strcmp(existing -> msg, buf) == 0)
+		if(existing->type == log_type && strcmp(existing->msg, buf) == 0)
 			return 0;
 	}
 
 	scheduled_msg *msg = &scheduled_msgs[scheduled_msg_count];
-	msg -> type = log_type;
-	msg -> ts = *ts;
-	msg -> dt = (timey_datetime) {0};
-	msg -> scheduled_ts = true;
-	msg -> print_label = true;
+	msg->type = log_type;
+	msg->ts = *ts;
+	msg->dt = (timey_datetime) {0};
+	msg->scheduled_ts = true;
+	msg->print_label = true;
 
-	strncpy(msg -> msg, buf, MAX_MSG_LEN);
-	msg -> msg[MAX_MSG_LEN] = '\0';
+	strncpy(msg->msg, buf, VL_MAX_MSG_LEN);
+	msg->msg[VL_MAX_MSG_LEN - 1] = '\0';
 
 	scheduled_msg_count++;
 
@@ -497,7 +495,7 @@ int vl_schedule_print_ts(vl_type log_type, struct timey_timestamp *ts, const cha
 	if(scheduled_msg_count >= MAX_DELAY_MSGS)
 		return 0;
 
-	char buf[MAX_MSG_LEN + 1];
+	char buf[VL_MAX_MSG_LEN];
 
 	va_list args;
 	va_start(args, fmt);
@@ -508,19 +506,19 @@ int vl_schedule_print_ts(vl_type log_type, struct timey_timestamp *ts, const cha
 	for(size_t i = 0; i < scheduled_msg_count; ++i)
 	{
 		scheduled_msg *existing = &scheduled_msgs[i];
-		if(existing -> type == log_type && strcmp(existing -> msg, buf) == 0)
+		if(existing->type == log_type && strcmp(existing->msg, buf) == 0)
 			return 0;
 	}
 
 	scheduled_msg *msg = &scheduled_msgs[scheduled_msg_count];
-	msg -> type = log_type;
-	msg -> ts = *ts;
-	msg -> dt = (timey_datetime) {0};
-	msg -> scheduled_ts = true;
-	msg -> print_label = false;
+	msg->type = log_type;
+	msg->ts = *ts;
+	msg->dt = (timey_datetime) {0};
+	msg->scheduled_ts = true;
+	msg->print_label = false;
 
-	strncpy(msg -> msg, buf, MAX_MSG_LEN);
-	msg -> msg[MAX_MSG_LEN] = '\0';
+	strncpy(msg->msg, buf, VL_MAX_MSG_LEN);
+	msg->msg[VL_MAX_MSG_LEN - 1] = '\0';
 
 	scheduled_msg_count++;
 
@@ -534,7 +532,7 @@ int vl_schedule_log_dt(vl_type log_type, timey_datetime *dt, const char *fmt, ..
 	if(scheduled_msg_count >= MAX_DELAY_MSGS)
 		return 0;
 
-	char buf[MAX_MSG_LEN + 1];
+	char buf[VL_MAX_MSG_LEN];
 
 	va_list args;
 	va_start(args, fmt);
@@ -545,19 +543,19 @@ int vl_schedule_log_dt(vl_type log_type, timey_datetime *dt, const char *fmt, ..
 	for(size_t i = 0; i < scheduled_msg_count; ++i)
 	{
 		scheduled_msg *existing = &scheduled_msgs[i];
-		if(existing -> type == log_type && strcmp(existing -> msg, buf) == 0)
+		if(existing->type == log_type && strcmp(existing->msg, buf) == 0)
 			return 0;
 	}
 
 	scheduled_msg *msg = &scheduled_msgs[scheduled_msg_count];
-	msg -> type = log_type;
-	msg -> dt = *dt;
-	msg -> ts = (timey_timestamp) {0};
-	msg -> scheduled_ts = false;
-	msg -> print_label = true;
+	msg->type = log_type;
+	msg->dt = *dt;
+	msg->ts = (timey_timestamp) {0};
+	msg->scheduled_ts = false;
+	msg->print_label = true;
 
-	strncpy(msg -> msg, buf, MAX_MSG_LEN);
-	msg -> msg[MAX_MSG_LEN] = '\0';
+	strncpy(msg->msg, buf, VL_MAX_MSG_LEN);
+	msg->msg[VL_MAX_MSG_LEN - 1] = '\0';
 
 	scheduled_msg_count++;
 
@@ -571,7 +569,7 @@ int vl_schedule_print_dt(vl_type log_type, timey_datetime *dt, const char *fmt, 
 	if(scheduled_msg_count >= MAX_DELAY_MSGS)
 		return 0;
 
-	char buf[MAX_MSG_LEN + 1];
+	char buf[VL_MAX_MSG_LEN];
 
 	va_list args;
 	va_start(args, fmt);
@@ -582,19 +580,19 @@ int vl_schedule_print_dt(vl_type log_type, timey_datetime *dt, const char *fmt, 
 	for(size_t i = 0; i < scheduled_msg_count; ++i)
 	{
 		scheduled_msg *existing = &scheduled_msgs[i];
-		if(existing -> type == log_type && strcmp(existing -> msg, buf) == 0)
+		if(existing->type == log_type && strcmp(existing->msg, buf) == 0)
 			return 0;
 	}
 
 	scheduled_msg *msg = &scheduled_msgs[scheduled_msg_count];
-	msg -> type = log_type;
-	msg -> dt = *dt;
-	msg -> ts = (timey_timestamp) {0};
-	msg -> scheduled_ts = false;
-	msg -> print_label = false;
+	msg->type = log_type;
+	msg->dt = *dt;
+	msg->ts = (timey_timestamp) {0};
+	msg->scheduled_ts = false;
+	msg->print_label = false;
 
-	strncpy(msg -> msg, buf, MAX_MSG_LEN);
-	msg -> msg[MAX_MSG_LEN] = '\0';
+	strncpy(msg->msg, buf, VL_MAX_MSG_LEN);
+	msg->msg[VL_MAX_MSG_LEN - 1] = '\0';
 
 	scheduled_msg_count++;
 
@@ -610,12 +608,12 @@ void vl_update(double delta_time)
 		delayed_msg *msg = &delayed_msgs[i];
 
 		// update timer
-		msg -> remaining_time_sec -= delta_time;
+		msg->remaining_time_sec -= delta_time;
 
 		// check to see if that message's time has passed
-		if(msg -> remaining_time_sec <= 0.0)
+		if(msg->remaining_time_sec <= 0.0)
 		{
-			print_msg(msg -> type, msg -> msg, msg -> print_label, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
+			print_msg(msg->type, msg->msg, msg->print_label, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
 
 			// remove this msg
 			size_t dest_pos = i;
@@ -646,17 +644,17 @@ void vl_update(double delta_time)
 		scheduled_msg *msg = &scheduled_msgs[i];
 
 		// check its timestamp or datetime vs. now_ts and now_dt
-		if(msg -> scheduled_ts)
+		if(msg->scheduled_ts)
 		{
 			// handle timestamp only
 
 			// first see if same period
-			if(strcmp(msg -> ts.period, now_ts.period) == 0)
+			if(strcmp(msg->ts.period, now_ts.period) == 0)
 			{
 				// now match hours, min, and sec
-				if(msg -> ts.hour12 == now_ts.hour12 && msg -> ts.min == now_ts.min && msg -> ts.sec == now_ts.sec)
+				if(msg->ts.hour12 == now_ts.hour12 && msg->ts.min == now_ts.min && msg->ts.sec == now_ts.sec)
 				{
-					print_msg(msg -> type, msg -> msg, msg -> print_label, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
+					print_msg(msg->type, msg->msg, msg->print_label, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
 
 					// use same logic from delayed msg removal above:
 					size_t dest_pos = i;
@@ -678,13 +676,13 @@ void vl_update(double delta_time)
 			// handle datetime
 
 			// first see if same period
-			if(strcmp(msg -> dt.time.period, now_dt.time.period) == 0)
+			if(strcmp(msg->dt.time.period, now_dt.time.period) == 0)
 			{
-				if(msg -> dt.year == now_dt.year && msg -> dt.month == now_dt.month && msg -> dt.day == now_dt.day &&
-						msg -> dt.time.hour12 == now_dt.time.hour12 && msg -> dt.time.min == now_dt.time.min &&
-						msg -> dt.time.sec == now_dt.time.sec)
+				if(msg->dt.year == now_dt.year && msg->dt.month == now_dt.month && msg->dt.day == now_dt.day &&
+						msg->dt.time.hour12 == now_dt.time.hour12 && msg->dt.time.min == now_dt.time.min &&
+						msg->dt.time.sec == now_dt.time.sec)
 				{
-					print_msg(msg -> type, msg -> msg, true, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
+					print_msg(msg->type, msg->msg, true, config.print_time, config.print_date, config.print_full_day_name, config.print_abbrev_day_name, config.print_full_month_name, config.print_abbrev_month_name);
 
 					// use same logic from delayed msg removal above:
 					size_t dest_pos = i;
