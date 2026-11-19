@@ -21,7 +21,6 @@ var vibrant__logs_8h =
     [ "VL_LIGHT_PINK", "da/d25/vibrant__logs_8h.html#a7e1895e353b27cdf9783bf9f6f08b468", null ],
     [ "VL_LIGHT_RED", "da/d25/vibrant__logs_8h.html#af961e4b6172afea921d9c6047937aef8", null ],
     [ "VL_LIGHT_YELLOW", "da/d25/vibrant__logs_8h.html#a9b940a128aac0555aa71bebcd48de522", null ],
-    [ "VL_MAX_MSG_LEN", "da/d25/vibrant__logs_8h.html#a37c93f20f1a959cfdda4d57ff371e3a6", null ],
     [ "VL_ORANGE", "da/d25/vibrant__logs_8h.html#aa93e2578a4e246ca25f31529971f3d85", null ],
     [ "VL_PINK", "da/d25/vibrant__logs_8h.html#a4cf34dff23d9b87cb16cb6910c3d3265", null ],
     [ "VL_RED", "da/d25/vibrant__logs_8h.html#acb9972b300e7783156ec6ff61767f427", null ],
@@ -44,12 +43,14 @@ var vibrant__logs_8h =
     [ "vl_delay_log", "da/d25/vibrant__logs_8h.html#a3d9432f7fd8699928a2dad27c4378119", null ],
     [ "vl_delay_print", "da/d25/vibrant__logs_8h.html#a36f1536a6de091179724db24adc141e0", null ],
     [ "vl_init", "da/d25/vibrant__logs_8h.html#a9e2f27e0e7a53c27935b7cbe66d0e2fb", null ],
+    [ "vl_is_init", "da/d25/vibrant__logs_8h.html#aa17a9688070033df1bcca306afa95461", null ],
     [ "vl_log", "da/d25/vibrant__logs_8h.html#aed16ae1b5919bc99745d1ec9f73dfd11", null ],
     [ "vl_print", "da/d25/vibrant__logs_8h.html#a34b3ec58e965d2404699864f47219eab", null ],
     [ "vl_schedule_log_dt", "da/d25/vibrant__logs_8h.html#a6ed33f1e73e1bc93838852e4ad67760f", null ],
     [ "vl_schedule_log_ts", "da/d25/vibrant__logs_8h.html#a018227371e7d07f3500ba42b1081863b", null ],
     [ "vl_schedule_print_dt", "da/d25/vibrant__logs_8h.html#a6310390757fc4d7bd8babf37cac0c49d", null ],
     [ "vl_schedule_print_ts", "da/d25/vibrant__logs_8h.html#a51478e83212e993895b5a3d9d4ccde70", null ],
+    [ "vl_shutdown", "da/d25/vibrant__logs_8h.html#aa512285e9fb050dbd574242ba622ac73", null ],
     [ "vl_update", "da/d25/vibrant__logs_8h.html#ae2d8bb8d6aa8619f61374ab674078cee", null ],
     [ "vl_use_config", "da/d25/vibrant__logs_8h.html#a9020baa18fecdcb9593513d60d9dd48b", null ]
 ];

@@ -399,11 +399,6 @@ typedef struct vl_config
 #endif
 
 /**
-  The max length of a message in VibrantLogs.
-*/
-#define VL_MAX_MSG_LEN 512
-
-/**
   Initializes the VibrantLogs library.
 
   @note This must be called for VibrantLogs
@@ -412,6 +407,17 @@ typedef struct vl_config
   @return 1 on success, 0 on failure.
 */
 VL_API int vl_init(void);
+/**
+  Determines if VibrantLogs has been
+  initialized yet.
+*/
+VL_API bool vl_is_init(void);
+/**
+  Shuts down the VibrantLogs library.
+
+  @return 1 on success, 0 on failure.
+*/
+VL_API int vl_shutdown(void);
 
 /**
   Sets the config of VibrantLogs.
@@ -427,9 +433,6 @@ VL_API vl_config *vl_curr_config(void);
 /**
   Prints a message.
 
-  @note The max length of a VibrantLogs message
-  is equal to VL_MAX_MSG_LEN.
-
   @note VibrantLogs does not automatically go to the next
   line when printing messages.
 
@@ -439,17 +442,11 @@ VL_API int vl_log(vl_type log_type, const char *fmt, ...);
 /**
   Continues printing characters to the last message printed.
 
-  @note The max length of a VibrantLogs message
-  is equal to VL_MAX_MSG_LEN.
-
   @return 1 on success, 0 on failure.
 */
 VL_API int vl_print(vl_type log_type, const char *fmt, ...);
 /**
   Prints a delayed message.
-
-  @note The max length of a VibrantLogs message
-  is equal to VL_MAX_MSG_LEN.
 
   @note VibrantLogs does not automatically go to the next line
   when printing messages.
@@ -462,9 +459,6 @@ VL_API int vl_print(vl_type log_type, const char *fmt, ...);
 VL_API int vl_delay_log(vl_type log_type, double seconds, const char *fmt, ...);
 /**
   Prints a delayed message.
-
-  @note The max length of a VibrantLogs message
-  is equal to VL_MAX_MSG_LEN.
 
   @note VibrantLogs does not automatically go to the next line
   when printing messages.
@@ -482,9 +476,6 @@ typedef struct timey_datetime timey_datetime;
 /**
   Schedules a message using a timestamp.
 
-  @note The max length of a VibrantLogs message
-  is equal to VL_MAX_MSG_LEN.
-
   @note VibrantLogs does not automatically go to the next line
   when printing messages.
 
@@ -496,9 +487,6 @@ typedef struct timey_datetime timey_datetime;
 VL_API int vl_schedule_log_ts(vl_type log_type, struct timey_timestamp *ts, const char *fmt, ...);
 /**
   Schedules a message using a timestamp.
-
-  @note The max length of a VibrantLogs message
-  is equal to VL_MAX_MSG_LEN.
 
   @note VibrantLogs does not automatically go to the next line
   when printing messages.
@@ -512,9 +500,6 @@ VL_API int vl_schedule_print_ts(vl_type log_type, struct timey_timestamp *ts, co
 /**
   Schedules a message using a datetime.
 
-  @note The max length of a VibrantLogs message
-  is equal to VL_MAX_MSG_LEN.
-
   @note VibrantLogs does not automatically go to the next line
   when printing messages.
 
@@ -526,9 +511,6 @@ VL_API int vl_schedule_print_ts(vl_type log_type, struct timey_timestamp *ts, co
 VL_API int vl_schedule_log_dt(vl_type log_type, struct timey_datetime *dt, const char *fmt, ...);
 /**
   Schedules a message using a datetime.
-
-  @note The max length of a VibrantLogs message
-  is VL_MAX_MSG_LEN.
 
   @note VibrantLogs does not automatically go to the next line
   when printing messages.
